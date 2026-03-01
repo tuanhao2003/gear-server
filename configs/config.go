@@ -1,33 +1,35 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
 
 type Config struct {
-	Server struct {
-		Port string
-	}
+	ServerPort string `mapstructure:"SERVER_PORT"`
 
-	Database struct {
-		Host     string
-		Port     string
-		User     string
-		Password string
-		DBName   string `mapstructure:"dbname"`
-		SSLMode  string `mapstructure:"sslmode"`
-	}
+	DBHost     string `mapstructure:"DB_HOST"`
+	DBPort     string `mapstructure:"DB_PORT"`
+	DBUser     string `mapstructure:"DB_USER"`
+	DBPassword string `mapstructure:"DB_PASSWORD"`
+	DBName     string `mapstructure:"DB_NAME"`
+	DBSSLMode  string `mapstructure:"DB_SSLMODE"`
 }
 
 func LoadConfig() (*Config, error) {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("gear-server/configs")
 	viper.AutomaticEnv()
 
-	if err := viper.ReadInConfig(); err != nil {
+	viper.BindEnv("SERVER_PORT")
+	viper.BindEnv("DB_HOST")
+	viper.BindEnv("DB_PORT")
+	viper.BindEnv("DB_USER")
+	viper.BindEnv("DB_PASSWORD")
+	viper.BindEnv("DB_NAME")
+	viper.BindEnv("DB_SSLMODE")
+
+	var cfg Config
+	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}
 
-	var cfg Config
-	err := viper.Unmarshal(&cfg)
-	return &cfg, err
+	return &cfg, nil
 }

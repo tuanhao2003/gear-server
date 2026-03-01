@@ -5,7 +5,7 @@ import (
 	"gear-server/internal/domain"
 	"gear-server/internal/repository"
 
-	"golang.org/x/crypto/bcrypt"
+	// "golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 

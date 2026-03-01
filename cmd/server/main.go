@@ -18,18 +18,18 @@ func main() {
 	}
 
 	db, err := database.Connect(
-		cfg.Database.Host,
-		cfg.Database.Port,
-		cfg.Database.User,
-		cfg.Database.Password,
-		cfg.Database.DBName,
-		cfg.Database.SSLMode,
+		cfg.DBHost,
+		cfg.DBPort,
+		cfg.DBUser,
+		cfg.DBPassword,
+		cfg.DBName,
+		cfg.DBSSLMode,
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	serverPort := fmt.Sprintf(":%s", cfg.Server.Port)
+	serverPort := fmt.Sprintf(":%s", cfg.ServerPort)
 
 	userRepo := repository.NewUserRepository(db)
 	userService := service.NewUserService(userRepo)
