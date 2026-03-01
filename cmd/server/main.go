@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"net/http"
-
 	"gear-server/configs"
+	"gear-server/internal/handler"
+	repository "gear-server/internal/repository/implement"
+	"gear-server/internal/router"
+	service "gear-server/internal/service/implement"
 	"gear-server/pkg/database"
+	"log"
 )
 
 func main() {
@@ -27,13 +29,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// serverPort := fmt.Sprintf(":%s", cfg.Server.Port)
+	serverPort := fmt.Sprintf(":%s", cfg.Server.Port)
 
-	// userRepo := repository.NewUserRepository(db)
-	// userService := service.NewUserService(userRepo)
-	// userHandler := handler.NewUserHandler(userService)
+	userRepo := repository.NewUserRepository(db)
+	userService := service.NewUserService(userRepo)
+	userHandler := handler.NewUserHandler(userService)
 
-	// r := router.Setup(userHandler)
+	r := router.SetupRouter(userHandler)
 
-	// http.ListenAndServe(serverPort, r)
+	if err := r.Run(serverPort); err != nil {
+		log.Fatal(err)
+	}
 }
