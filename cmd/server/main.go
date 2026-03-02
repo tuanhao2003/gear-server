@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"gear-server/configs"
+	"gear-server/config"
 	"gear-server/internal/handler"
-	repository "gear-server/internal/repository/implement"
+	"gear-server/internal/repository/implement"
 	"gear-server/internal/router"
-	service "gear-server/internal/service/implement"
+	"gear-server/internal/service/implement"
 	"gear-server/pkg/database"
 	"log"
 )
@@ -17,25 +17,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db, err := database.Connect(
-		cfg.DBHost,
-		cfg.DBPort,
-		cfg.DBUser,
-		cfg.DBPassword,
-		cfg.DBName,
-		cfg.DBSSLMode,
-	)
+	dataSource := cfg.GetDataSource()
+
+	database.RunMigrations(dataSource)
+
+	db, err := database.Connect(dataSource)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	serverPort := fmt.Sprintf(":%s", cfg.ServerPort)
 
-	userRepo := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepo)
-	userHandler := handler.NewUserHandler(userService)
+	userRepo := repositoryimpl.NewUserRepository(db)
+	authService := serviceimpl.NewAuthService(userRepo)
+	authHandler := handler.NewAuthHandler(authService)
 
-	r := router.SetupRouter(userHandler)
+	r := router.SetupRouter(authHandler)
 
 	if err := r.Run(serverPort); err != nil {
 		log.Fatal(err)

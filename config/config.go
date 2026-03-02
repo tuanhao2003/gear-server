@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/spf13/viper"
 )
 
@@ -30,6 +32,18 @@ func LoadConfig() (*Config, error) {
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}
-
+	
 	return &cfg, nil
+}
+
+func (cfg *Config) GetDataSource() string {
+	return fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		cfg.DBUser,
+		cfg.DBPassword,
+		cfg.DBHost,
+		cfg.DBPort,
+		cfg.DBName,
+		cfg.DBSSLMode,
+	)
 }
