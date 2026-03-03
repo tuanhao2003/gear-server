@@ -4,7 +4,10 @@ import (
 	"net/http"
 
 	"gear-server/internal/dto"
+	"gear-server/internal/enum"
+	"gear-server/internal/mapper"
 	"gear-server/internal/service"
+	"gear-server/pkg/helper"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,12 +21,18 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 		authService: authService,
 	}
 }
-
-func (h *AuthHandler) SignIn(context *gin.Context) {
+func (h *AuthHandler) SignIn(c *gin.Context) {
 	var requestDto dto.SignInRequest
 
-	if err := context.ShouldBind(&requestDto); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+	if err := c.ShouldBind(&requestDto); err != nil {
+		c.JSON(http.StatusBadRequest,
+			helper.Response(
+				enum.VALIDATION_ERROR,
+				"auth validation error",
+				nil,
+				helper.WithError[error](err),
+			),
+		)
 		return
 	}
 
@@ -32,11 +41,26 @@ func (h *AuthHandler) SignIn(context *gin.Context) {
 		usernameOrEmail = requestDto.Email
 	}
 
-	user, err := h.authService.SignIn(usernameOrEmail, requestDto.Password)
+	userEntity, err := h.authService.SignIn(usernameOrEmail, requestDto.Password)
 	if err != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized,
+			helper.Response(
+				enum.UNAUTHORIZED,
+				"Invalid credentials",
+				nil,
+				helper.WithError[error](err),
+			),
+		)
 		return
 	}
 
-	context.JSON(http.StatusOK, user)
+	userResponse := *mapper.ToUserResponse(userEntity)
+
+	c.JSON(http.StatusOK,
+		helper.Response(
+			enum.SUCCESS,
+			"success",
+			userResponse,
+		),
+	)
 }

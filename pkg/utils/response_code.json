@@ -1,0 +1,21 @@
+{
+    "0000": "Internal server error",
+    "0001": "Success",
+    "0002": "Unauthorized",
+    "0003": "Validation error",
+    "0004": "Missing parameters",
+    "0005": "Method not allowed",
+    "0006": "Unsupported media type",
+    "0007": "Request timeout",
+    "0008": "Too many requests",
+    "0009": "Service unavailable",
+
+    "1000": "Unknown user's error",
+    "1001": "User not found",
+    "1002": "User already exists",
+    "1003": "User invalid",
+    "1004": "Conflict in user action",
+    "1005": "Missing user's field",
+    "1006": "User related error"
+    
+}

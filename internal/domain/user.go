@@ -8,7 +8,7 @@ type User struct {
 	Email        string    `gorm:"uniqueIndex;not null"`
 	HashPassword string    `gorm:"not null" json:"-"`
 	Profile      Profile   `gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
-	IsActive     *bool      `gorm:"default:true"`
+	IsActive     *bool     `gorm:"default:true"`
 	CreatedAt    time.Time `gorm:"autoCreateTime"`
 	UpdatedAt    time.Time `gorm:"autoUpdateTime"`
 }
