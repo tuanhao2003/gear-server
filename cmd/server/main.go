@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"net/http"
-
-	"gear-server/configs"
+	"gear-server/config"
+	"gear-server/internal/handler"
+	"gear-server/internal/repository/implement"
+	"gear-server/internal/router"
+	"gear-server/internal/service/implement"
 	"gear-server/pkg/database"
+	"log"
 )
 
 func main() {
@@ -15,25 +17,24 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db, err := database.Connect(
-		cfg.Database.Host,
-		cfg.Database.Port,
-		cfg.Database.User,
-		cfg.Database.Password,
-		cfg.Database.DBName,
-		cfg.Database.SSLMode,
-	)
+	dataSource := cfg.GetDataSource()
+
+	database.RunMigrations(dataSource)
+
+	db, err := database.Connect(dataSource)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// serverPort := fmt.Sprintf(":%s", cfg.Server.Port)
+	serverPort := fmt.Sprintf(":%s", cfg.ServerPort)
 
-	// userRepo := repository.NewUserRepository(db)
-	// userService := service.NewUserService(userRepo)
-	// userHandler := handler.NewUserHandler(userService)
+	userRepo := repositoryimpl.NewUserRepository(db)
+	authService := serviceimpl.NewAuthService(userRepo)
+	authHandler := handler.NewAuthHandler(authService)
 
-	// r := router.Setup(userHandler)
+	r := router.SetupRouter(authHandler)
 
-	// http.ListenAndServe(serverPort, r)
+	if err := r.Run(serverPort); err != nil {
+		log.Fatal(err)
+	}
 }
