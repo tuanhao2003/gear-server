@@ -15,6 +15,8 @@ type Config struct {
 	DBPassword string `mapstructure:"DB_PASSWORD"`
 	DBName     string `mapstructure:"DB_NAME"`
 	DBSSLMode  string `mapstructure:"DB_SSLMODE"`
+
+	DBUrl      string `mapstructure:"DB_URL"`
 }
 
 func LoadConfig() (*Config, error) {
@@ -27,6 +29,7 @@ func LoadConfig() (*Config, error) {
 	viper.BindEnv("DB_PASSWORD")
 	viper.BindEnv("DB_NAME")
 	viper.BindEnv("DB_SSLMODE")
+	viper.BindEnv("DB_URL")
 
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {
@@ -37,6 +40,12 @@ func LoadConfig() (*Config, error) {
 }
 
 func (cfg *Config) GetDataSource() string {
+	dataSource := cfg.DBUrl
+
+	if dataSource != "" {
+		return dataSource
+	}
+
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		cfg.DBUser,
